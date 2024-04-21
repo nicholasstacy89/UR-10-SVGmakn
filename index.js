@@ -1,58 +1,39 @@
-
-const jest = require('jest');
 const inquirer = require('inquirer');
 const fs = require('fs');
+const makeSVG = require('./lib/makeSVG');
 
-
-//shapes
-const circle = `circle cx="50" cy="50" r="40" `;
-const square = `rect x="10" y="10" width="80" height="80" `;
-const triangle = `polygon points="50,10 10,90 90,90" `;
-
-//prompts to build the svg
-
-inquirer
-    .prompt([
-        {
-        type: 'list',
-        name: 'shape',
-        message: 'What shape would you like to draw?',
-        choices: [circle, square, triangle],
-        },
-        {
+const questions = [
+    {
         type: 'input',
-        name: 'shapeColor',
-        message: 'What color would you like the shape to be?',
-        },
-        {
-        type: 'input',
+        message: 'Enter 3 letters:',
         name: 'text',
-        message: 'What three letters would you like added to the shape?',
-        },
-        {
+    },
+    {
         type: 'input',
-        name: 'textColor',
-        message: 'What color would you like the text to be?',
-        },
-        {
+        message: 'Choose a color:',
+        name: 'color',
+    },
+    {
         type: 'input',
-        name: 'title',
-        message: 'What would you like the title to be?',
-        }
-    ])
-    .then((answers) => {
-       
-        const svg = `<svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
-<${answers.shape} 
-    stroke="${answers.shapeColor}" fill="${answers.shapeColor}" stroke-width="10"/>
-    <text x="27" y="75" font-family="Verdana" font-size="20" fill="${answers.textColor}">${answers.text}</text>
-</svg>`;
-console.log(svg);
-const fileName = `${answers.title}`;
-        fs.writeFile(`./examples/${fileName}.svg`, svg, function(err) {
-           if (err) {
-                return console.log(err);
-            }
-            console.log("Success!");
-        })});
-         
+        message: 'Select shape square, circle, or triangle:',
+        name: 'shape',
+
+    }
+];
+
+function init() {
+    inquirer.prompt(questions).then((response) => {
+        console.log(response);
+        writeFile(response);
+    });
+}
+
+function writeFile(data) {
+    const svgFile = makeSVG(data);
+
+    fs.writeFile(`./examples/${data.text}.svg`, svgFile, (err) =>
+    err ? console.error('failed to create file!' + err) : console.log('Success!'));
+
+}
+
+init();
